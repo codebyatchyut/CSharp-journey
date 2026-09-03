@@ -5,11 +5,18 @@ namespace ConsoleApp2.Data
 {
     public class DataContextEF: DbContext
     {
+        private readonly string _connectionString;
+        
+        public DataContextEF(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             if (!options.IsConfigured)
             {
-                options.UseSqlServer("Server=(localdb)\\c#;Database=DotNetCourseDatabase;Trusted_Connection=true", 
+                options.UseSqlServer(_connectionString, 
                     options => options.EnableRetryOnFailure());
             }
         }
