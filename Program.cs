@@ -1,5 +1,7 @@
 ﻿using ConsoleApp2.Models;
 using ConsoleApp2.Data;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 
 
 
@@ -9,6 +11,13 @@ namespace MyApp
     {
         public static void Main(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            string connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string not found");
+
             Computer c1 = new Computer{
                 Motherboard = "ASUS ROG Strix Z590-E",
                 CPUCores = 8,
@@ -19,7 +28,7 @@ namespace MyApp
             };
 
             DataContextDapper dataContext = new DataContextDapper();
-            DataContextEF dataContextEF = new DataContextEF();
+            DataContextEF dataContextEF = new DataContextEF(connectionString);
 
             // Inserting data using Dapper
             //string insertSqlCommand = $@"
