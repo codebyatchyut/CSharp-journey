@@ -12,14 +12,25 @@ namespace MyApp
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
+            Task task = new Task(() =>
+            {
+                Thread.Sleep(2000);
+                Console.WriteLine("Task");
+            });
+            
+            Console.WriteLine("Main thread");
+            task.Start();
+            await task;
+            Console.WriteLine("After task1");
+            Console.WriteLine("After task2");
+            //var configuration = new ConfigurationBuilder()
+            //    .AddJsonFile("appsettings.json")
+            //    .Build();
 
-            string connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string not found");
+            //string connectionString = configuration.GetConnectionString("DefaultConnection")
+            //    ?? throw new InvalidOperationException("Connection string not found");
 
             //Computer c1 = new Computer
             //{
@@ -32,7 +43,7 @@ namespace MyApp
             //};
 
             //DataContextDapper dataContext = new DataContextDapper();
-            DataContextEF dataContextEF = new DataContextEF(connectionString);
+            //DataContextEF dataContextEF = new DataContextEF(connectionString);
 
             // Inserting data using Dapper
             //string insertSqlCommand = $@"
@@ -76,52 +87,54 @@ namespace MyApp
 
             // Serializing and Deserializing (We can do by using built in System.Text.Json or with package Newtonsoft.Json)
 
-            string computersJson = File.ReadAllText("Computers.json");
-            Console.WriteLine(computersJson);
+            //string computersJson = File.ReadAllText("Computers.json");
+            //Console.WriteLine(computersJson);
 
             // Deserizliaing using System.Text.Json
 
-           JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
-           {
-               PropertyNamingPolicy = JsonNamingPolicy.CamelCase // We need this option for both serialization and deserialization to match the property names in the JSON file with the C# class properties when using System.Text.Json.
-           };
+            //JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
+            //{
+            //    PropertyNamingPolicy = JsonNamingPolicy.CamelCase // We need this option for both serialization and deserialization to match the property names in the JSON file with the C# class properties when using System.Text.Json.
+            //};
 
-            IEnumerable<Computer>? computers = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Computer>>(computersJson, jsonSerializerOptions)
-                                ?? throw new InvalidOperationException("Deserialization failed");
+            // IEnumerable<Computer>? computers = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<Computer>>(computersJson, jsonSerializerOptions)
+            //                     ?? throw new InvalidOperationException("Deserialization failed");
 
-            if (computers != null)
-            {
-                foreach (Computer computer in computers)
-                {
-                    Console.WriteLine(computer.Motherboard);
-                }
-            }
+            // if (computers != null)
+            // {
+            //     foreach (Computer computer in computers)
+            //     {
+            //         Console.WriteLine(computer.Motherboard);
+            //     }
+            // }
 
-            // Serizlizing using System.Text.Json
-            IEnumerable<Computer> computersEF1 = dataContextEF.Set<Computer>().ToList();
-            string computersCopySystem = System.Text.Json.JsonSerializer.Serialize(computersEF1, jsonSerializerOptions);
-            File.WriteAllText("ComputersCopySystem.json", computersCopySystem);
+            // // Serizlizing using System.Text.Json
+            // IEnumerable<Computer> computersEF1 = dataContextEF.Set<Computer>().ToList();
+            // string computersCopySystem = System.Text.Json.JsonSerializer.Serialize(computersEF1, jsonSerializerOptions);
+            // File.WriteAllText("ComputersCopySystem.json", computersCopySystem);
 
-            JsonSerializerSettings settings = new JsonSerializerSettings()
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
+            // JsonSerializerSettings settings = new JsonSerializerSettings()
+            // {
+            //     ContractResolver = new CamelCasePropertyNamesContractResolver()
+            // };
 
-            // Deserializing using Newtonsoft.Json
-            IEnumerable<Computer>? computers1 = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<Computer>>(computersJson)
-                                ?? throw new InvalidOperationException("Deserialization failed");
-            if (computers1 != null)
-            {
-                foreach (Computer computer in computers1)
-                {
-                    Console.WriteLine(computer.Motherboard);
-                }
-            }
+            // // Deserializing using Newtonsoft.Json
+            // IEnumerable<Computer>? computers1 = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<Computer>>(computersJson)
+            //                     ?? throw new InvalidOperationException("Deserialization failed");
+            // if (computers1 != null)
+            // {
+            //     foreach (Computer computer in computers1)
+            //     {
+            //         Console.WriteLine(computer.Motherboard);
+            //     }
+            // }
 
-            // Serializing using Newtonsoft.Json
-            IEnumerable<Computer> computersEF2 = dataContextEF.Set<Computer>().ToList();
-            string computersCopyNewtonsoft = Newtonsoft.Json.JsonConvert.SerializeObject(computersEF2, settings);
-            File.WriteAllText("ComputersCopyNewtonsoft.json", computersCopyNewtonsoft);
+            // // Serializing using Newtonsoft.Json
+            // IEnumerable<Computer> computersEF2 = dataContextEF.Set<Computer>().ToList();
+            // string computersCopyNewtonsoft = Newtonsoft.Json.JsonConvert.SerializeObject(computersEF2, settings);
+            // File.WriteAllText("ComputersCopyNewtonsoft.json", computersCopyNewtonsoft);
+
+
         }
     }
 }
